@@ -29,10 +29,13 @@ runs:
 
     - name: Run Sentinel Warden
       shell: bash
+      env:
+        INPUT_PATH: ${{ inputs.path }}
+        INPUT_FAIL_ON: ${{ inputs.fail-on }}
       run: |
-        npx --yes sentinel-warden@latest scan "${{ inputs.path }}" \
-          --format sarif --output warden.sarif --fail-on "${{ inputs.fail-on }}" || echo "WARDEN_FAILED=1" >> "$GITHUB_ENV"
-        npx --yes sentinel-warden@latest scan "${{ inputs.path }}" --no-color || true
+        npx --yes sentinel-warden@latest scan "$INPUT_PATH" \
+          --format sarif --output warden.sarif --fail-on "$INPUT_FAIL_ON" || echo "WARDEN_FAILED=1" >> "$GITHUB_ENV"
+        npx --yes sentinel-warden@latest scan "$INPUT_PATH" --no-color || true
 
     - name: Upload SARIF
       if: ${{ inputs.upload-sarif == 'true' && hashFiles('warden.sarif') != '' }}
